@@ -1,0 +1,44 @@
+  <!doctype html>
+  <html>
+  <head><meta charset="utf-8"><title>Clipboard Read Probe (local)</title></head>
+  <body>
+  <h1>Clipboard Read Probe</h1>
+  <button id="go">Run probe</button>
+  <pre id="out"></pre>
+  <script>
+  const out = document.getElementById('out');
+  const log = (k, v) => {
+    const line = `${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`;
+    out.textContent += line + '\n';
+    console.log(line);
+  };
+
+  async function probe() {
+    out.textContent = '';
+    log('userAgent', navigator.userAgent);
+    log('isSecureContext', window.isSecureContext);
+    log('origin', location.origin);
+    log('hasClipboardAPI', !!(navigator.clipboard && navigator.clipboard.readText));
+
+    let permState = 'unknown';
+    try {
+      const p = await navigator.permissions.query({ name: 'clipboard-read' });
+      permState = p.state;
+    } catch (e) {
+      permState = 'query-failed: ' + e.message;
+    }
+    log('clipboard-read permission', permState);
+
+    try {
+      const text = await navigator.clipboard.readText();
+      log('clipboard.readText length', text.length);
+      log('clipboard.readText preview', text.slice(0, 40));
+    } catch (e) {
+      log('clipboard.readText error', e.name + ': ' + e.message);
+    }
+  }
+
+  document.getElementById('go').addEventListener('click', probe);
+  </script>
+  </body>
+  </html>
